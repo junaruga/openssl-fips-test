@@ -23,3 +23,8 @@ clean :
 test :
 	@echo "Testing..."
 	./$(EXE)
+
+.PHONY: test-strace
+strace-test :
+	@echo "Testing with strace..."
+	strace ./$(EXE)
