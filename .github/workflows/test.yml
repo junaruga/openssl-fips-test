@@ -1,0 +1,72 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test-openssls:
+    name: >-
+      ${{ matrix.openssl }} ${{ matrix.name_extra || '' }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, openssl: openssl-3.0.7, fips-enabled: true, name_extra: 'FIPS' }
+          - { os: ubuntu-latest, openssl: openssl-3.0.7 }
+    steps:
+      - name: install deps
+        run: sudo apt install -qq strace
+      - name: repo checkout
+        uses: actions/checkout@v3
+      - if: matrix.fips-enabled
+        run: echo "configure_fips_opt=enable-fips" >> $GITHUB_ENV
+      - name: prepare openssl
+        run: |
+          mkdir -p tmp/build-openssl && cd tmp/build-openssl
+          case ${{ matrix.openssl }} in
+          openssl-*)
+            curl -OL https://ftp.openssl.org/source/${{ matrix.openssl }}.tar.gz
+            tar xf ${{ matrix.openssl }}.tar.gz && cd ${{ matrix.openssl }}
+            # shared is required for 1.0.x.
+            ./Configure --prefix=$HOME/.openssl/${{ matrix.openssl }} --libdir=lib \
+                shared linux-x86_64 $configure_fips_opt
+            make depend
+            ;;
+          *)
+            false
+            ;;
+          esac
+          make -j4
+          make install_sw
+
+      # See <https://github.com/openssl/openssl/blob/master/README-FIPS.md>.
+      - if: matrix.fips-enabled
+        name: prepre openssl fips
+        run: make install_fips
+        working-directory: tmp/build-openssl/${{ matrix.openssl }}
+
+      - if: matrix.fips-enabled
+        run: ls -l $HOME/.openssl/${{ matrix.openssl }}/ssl/fipsmodule.cnf
+
+      - name: compile
+        run:  make
+
+      # See <https://www.openssl.org/docs/manmaster/man7/fips_module.html>
+      # - Selectively making applications use the FIPS module by default
+      - if: matrix.fips-enabled
+        run: sed -e "s|@@OPENSSL_DIR@@|$HOME/.openssl/${{ matrix.openssl }}|" ssl/openssl_fips.cnf.tmpl > ssl/openssl_fips.cnf
+
+      # Debug
+      - if: matrix.fips-enabled
+        run: cat ssl/openssl_fips.cnf
+
+      # Change the default OpenSSL config file for FIPS mode.
+      - if: matrix.fips-enabled
+        run: echo "OPENSSL_CONF=$(pwd)/ssl/openssl_fips.cnf" >> $GITHUB_ENV
+
+      - name: test
+        run: make test
+
+      - if: matrix.fips-enabled
+        name: strace
+        run: make strace-test
