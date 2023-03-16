@@ -13,13 +13,37 @@ int main(int argc, char *argv[])
 
     libctx = OSSL_LIB_CTX_new();
     printf("FIPS mode on.\n");
-    EVP_default_properties_enable_fips(libctx, 1);
+    if (!EVP_default_properties_enable_fips(libctx, 1)) {
+        status = EXIT_FAILURE;
+        goto err;
+    }
+
+    fips_enabled = EVP_default_properties_is_fips_enabled(libctx);
+    printf("FIPS mode: %d\n", fips_enabled);
+
+    printf("FIPS mode on 2nd time.\n");
+    if (!EVP_default_properties_enable_fips(libctx, 1)) {
+        status = EXIT_FAILURE;
+        goto err;
+    }
 
     fips_enabled = EVP_default_properties_is_fips_enabled(libctx);
     printf("FIPS mode: %d\n", fips_enabled);
 
     printf("FIPS mode off.\n");
-    EVP_default_properties_enable_fips(libctx, 0);
+    if (!EVP_default_properties_enable_fips(libctx, 0)) {
+        status = EXIT_FAILURE;
+        goto err;
+    }
+
+    fips_enabled = EVP_default_properties_is_fips_enabled(libctx);
+    printf("FIPS mode: %d\n", fips_enabled);
+
+    printf("FIPS mode off 2nd time.\n");
+    if (!EVP_default_properties_enable_fips(libctx, 0)) {
+        status = EXIT_FAILURE;
+        goto err;
+    }
 
     fips_enabled = EVP_default_properties_is_fips_enabled(libctx);
     printf("FIPS mode: %d\n", fips_enabled);
