@@ -2,3 +2,4 @@
 *.swp
 *~
 /fips_mode
+/fips_mode_set
