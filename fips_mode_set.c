@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <openssl/crypto.h>
 #include <openssl/evp.h>
 
 int main(int argc, char *argv[])
