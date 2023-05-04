@@ -1,8 +1,11 @@
 CC = gcc
 SRCS_GET = fips_mode.c
 SRCS_SET = fips_mode_set.c
-CFLAGS =
-LDFLAGS = -g
+CFLAGS = $(OPTFLAGS) $(DEBUGFLAGS)
+OPTFLAGS = -O0
+DEBUGFLAGS = -g3 -ggdb3 -gdwarf-5
+INCFLAGS =
+LDFLAGS =
 OBJS_GET = $(SRCS_GET:.c=.o)
 OBJS_SET = $(SRCS_SET:.c=.o)
 EXE = fips_mode
@@ -11,7 +14,7 @@ EXE_ALL= $(EXE) $(EXE_SET)
 LIBS = -lssl -lcrypto
 
 .c.o :
-	$(CC) -c $(CFLAGS) $(INCLUDES) $< -o $@
+	$(CC) -c $(CFLAGS) $(INCFLAGS) $< -o $@
 
 .PHONY: all
 all : $(EXE) $(EXE_SET)
@@ -29,6 +32,7 @@ clean :
 .PHONY: test
 test :
 	@echo "Testing..."
+	ldd ./$(EXE)
 	./$(EXE)
 
 .PHONY: test-set

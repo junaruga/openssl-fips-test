@@ -93,15 +93,27 @@ Loaded providers:
 FIPS mode enabled: 1
 ```
 
-### With make (WIP)
+### With make
+
+Compile.
 
 ```
-$ make
+$ make \
+  INCFLAGS="-I /home/jaruga/.local/openssl-3.0.8-fips-debug-trace/include" \
+  LDFLAGS="-L /home/jaruga/.local/openssl-3.0.8-fips-debug-trace/lib64"
+```
 
-$ ./fips_mode
+Run the commands.
+
+```
+$ LD_LIBRARY_PATH=$HOME/.local/openssl-3.0.8-fips-debug-trace/lib64/ \
+  OPENSSL_CONF=/home/jaruga/.local/openssl-3.0.8-fips-debug-trace/ssl/openssl_fips.cnf \
+  ./fips_mode
 ...
 
-$ ./fips_mode_set
+$ LD_LIBRARY_PATH=$HOME/.local/openssl-3.0.8-fips-debug-trace/lib64/ \
+  OPENSSL_CONF=/home/jaruga/.local/openssl-3.0.8-fips-debug-trace/ssl/openssl_fips.cnf \
+  ./fips_mode_set
 FIPS mode: 0
 FIPS mode on.
 FIPS mode: 1
