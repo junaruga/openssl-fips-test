@@ -6,12 +6,100 @@ This repository is to test OpenSSL API especially the FIPS mode related APIs.
 
 ## How to use
 
+### Prepare OpenSSL
+
+The `enable-fips` option is to install the FIPS mododule.
+
+```
+$ git clone https://github.com/openssl/openssl.git
+
+$ cd openssl
+
+$ git checkout openssl-3.0.8
+
+$ ./Configure \
+  --prefix=$HOME/.local/openssl-3.0.8-fips-debug-trace \
+  shared \
+  enable-fips \
+  enable-trace \
+  -O0 -g3 -ggdb3 -gdwarf-5
+
+$ make -j$(nproc)
+
+$ make install
+
+$ LD_LIBRARY_PATH=$HOME/.local/openssl-3.0.8-fips-debug-trace/lib64/ \
+  $HOME/.local/openssl-3.0.8-fips-debug-trace/bin/openssl version
+OpenSSL 3.0.8 7 Feb 2023 (Library: OpenSSL 3.0.8 7 Feb 2023)
+```
+
+Set the following file.
+
+```
+$ cat $HOME/.local/openssl-3.0.8-fips-debug-trace/ssl/openssl_fips.cnf
+config_diagnostics = 1
+openssl_conf = openssl_init
+
+.include /home/jaruga/.local/openssl-3.0.8-fips-debug-trace/ssl/fipsmodule.cnf
+#.include ./fipsmodule.cnf
+
+[openssl_init]
+providers = provider_sect
+alg_section = algorithm_sect
+
+[provider_sect]
+fips = fips_sect
+base = base_sect
+
+[base_sect]
+activate = 1
+
+[algorithm_sect]
+default_properties = fips=yes
+```
+
+### Directly with gcc
+
+Compile the program to test if FIPS mode is enabled or not.
+
+```
+$ gcc \
+  -I /home/jaruga/.local/openssl-3.0.8-fips-debug-trace/include \
+  -L /home/jaruga/.local/openssl-3.0.8-fips-debug-trace/lib64 \
+  -lcrypto \
+  -o fips_mode \
+  fips_mode.c
+```
+
+Run the program. The FIPS mode is off with the command below.
+
+```
+$ LD_LIBRARY_PATH=$HOME/.local/openssl-3.0.8-fips-debug-trace/lib64/ \
+  ./fips_mode
+Loaded providers:
+  default
+FIPS mode enabled: 0
+```
+
+The FIPS mode is on with the command below.
+
+```
+$ LD_LIBRARY_PATH=$HOME/.local/openssl-3.0.8-fips-debug-trace/lib64/ \
+  OPENSSL_CONF=/home/jaruga/.local/openssl-3.0.8-fips-debug-trace/ssl/openssl_fips.cnf \
+  ./fips_mode
+Loaded providers:
+  fips
+  base
+FIPS mode enabled: 1
+```
+
+### With make (WIP)
+
 ```
 $ make
 
 $ ./fips_mode
-FIPS mode provider available: 0
-FIPS mode enabled: 0
+...
 
 $ ./fips_mode_set
 FIPS mode: 0
@@ -44,37 +132,4 @@ $ cat /path/to/openssl.cnf
 ...
 [algorithm_sect]
 default_properties = fips=yes
-```
-
-You can test own OpenSSL built from the source with FIPS option with the FIPS config file. Below is the example.
-
-```
-$ cat /home/jaruga/.local/openssl-3.0.8-fips/ssl/openssl_fips.cnf
-config_diagnostics = 1
-openssl_conf = openssl_init
-
-.include /home/jaruga/.local/openssl-3.0.8-fips/ssl/fipsmodule.cnf
-#.include ./fipsmodule.cnf
-
-[openssl_init]
-providers = provider_sect
-alg_section = algorithm_sect
-
-[provider_sect]
-fips = fips_sect
-base = base_sect
-
-[base_sect]
-activate = 1
-
-[algorithm_sect]
-default_properties = fips=yes
-```
-
-```
-$ LD_LIBRARY_PATH=/home/jaruga/.local/openssl-3.0.8-fips/lib/ \
-  OPENSSL_CONF=/home/jaruga/.local/openssl-3.0.8-fips/ssl/openssl_fips.cnf \
-  ~/git/openssl-test/fips_mode
-FIPS mode provider available: 1
-FIPS mode enabled: 1
 ```
