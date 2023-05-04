@@ -28,8 +28,8 @@ jobs:
             curl -OL https://ftp.openssl.org/source/${{ matrix.openssl }}.tar.gz
             tar xf ${{ matrix.openssl }}.tar.gz && cd ${{ matrix.openssl }}
             # shared is required for 1.0.x.
-            ./Configure --prefix=$HOME/.openssl/${{ matrix.openssl }} --libdir=lib \
-                shared linux-x86_64 $configure_fips_opt
+            ./Configure --prefix=$HOME/.openssl/${{ matrix.openssl }} \
+                shared $configure_fips_opt
             make depend
             ;;
           *)
@@ -49,7 +49,10 @@ jobs:
         run: ls -l $HOME/.openssl/${{ matrix.openssl }}/ssl/fipsmodule.cnf
 
       - name: compile
-        run:  make
+        run: |
+          make \
+            INCFLAGS="-I $HOME/.openssl/${{ matrix.openssl }}/include" \
+            LDFLAGS="-L $HOME/.openssl/${{ matrix.openssl }}/lib64"
 
       # See <https://www.openssl.org/docs/manmaster/man7/fips_module.html>
       # - Selectively making applications use the FIPS module by default
@@ -65,10 +68,14 @@ jobs:
         run: echo "OPENSSL_CONF=$(pwd)/ssl/openssl_fips.cnf" >> $GITHUB_ENV
 
       - name: test FIPS mode get
-        run: make test
+        run: |
+          LD_LIBRARY_PATH=$HOME/.openssl/${{ matrix.openssl }}/lib64 \
+            make test
 
       - name: test FIPS mode set
-        run: make test-set
+        run: |
+          LD_LIBRARY_PATH=$HOME/.openssl/${{ matrix.openssl }}/lib64 \
+            make test-set
 
       - if: matrix.fips-enabled
         name: strace
