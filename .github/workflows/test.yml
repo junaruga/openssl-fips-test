@@ -29,7 +29,7 @@ jobs:
             tar xf ${{ matrix.openssl }}.tar.gz && cd ${{ matrix.openssl }}
             # shared is required for 1.0.x.
             ./Configure --prefix=$HOME/.openssl/${{ matrix.openssl }} \
-                shared $configure_fips_opt
+                shared $configure_fips_opt enable-trace
             make depend
             ;;
           *)
@@ -76,6 +76,11 @@ jobs:
         run: |
           LD_LIBRARY_PATH=$HOME/.openssl/${{ matrix.openssl }}/lib64 \
             make test-set
+
+      - name: test OpenSSL trace API
+        run: |
+          LD_LIBRARY_PATH=$HOME/.openssl/${{ matrix.openssl }}/lib64 \
+            make test-trace
 
       - if: matrix.fips-enabled
         name: strace
