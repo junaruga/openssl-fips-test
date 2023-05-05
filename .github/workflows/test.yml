@@ -20,6 +20,9 @@ jobs:
         uses: actions/checkout@v3
       - if: matrix.fips-enabled
         run: echo "configure_fips_opt=enable-fips" >> $GITHUB_ENV
+      # Remove system OpenSSL to prevent a C program is unintentionally built with.
+      - name: remove system openssl
+        run: sudo apt autoremove openssl
       - name: prepare openssl
         run: |
           mkdir -p tmp/build-openssl && cd tmp/build-openssl
