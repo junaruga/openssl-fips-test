@@ -15,10 +15,11 @@ $ git clone https://github.com/openssl/openssl.git
 
 $ cd openssl
 
-$ git checkout openssl-3.0.8
+$ git checkout openssl-3.0.9
 
 $ ./Configure \
-  --prefix=$HOME/.local/openssl-3.0.8-fips-debug-trace \
+  --prefix=${HOME}/.local/openssl-3.0.9-fips-debug \
+  --libdir=lib \
   shared \
   enable-fips \
   enable-trace \
@@ -28,20 +29,21 @@ $ make -j$(nproc)
 
 $ make install
 
-$ LD_LIBRARY_PATH=$HOME/.local/openssl-3.0.8-fips-debug-trace/lib64/ \
-  $HOME/.local/openssl-3.0.8-fips-debug-trace/bin/openssl version
-OpenSSL 3.0.8 7 Feb 2023 (Library: OpenSSL 3.0.8 7 Feb 2023)
+$ LD_LIBRARY_PATH="${HOME}/.local/openssl-3.0.9-fips-debug/lib/" \
+  "${HOME}/.local/openssl-3.0.9-fips-debug/bin/openssl" version
+OpenSSL 3.0.9 30 May 2023 (Library: OpenSSL 3.0.9 30 May 2023)
 ```
 
 Set the following file.
 
 ```
-$ cat $HOME/.local/openssl-3.0.8-fips-debug-trace/ssl/openssl_fips.cnf
+$ cat ~/.local/openssl-3.0.9-fips-debug/ssl/openssl_fips.cnf
 config_diagnostics = 1
 openssl_conf = openssl_init
 
-.include /home/jaruga/.local/openssl-3.0.8-fips-debug-trace/ssl/fipsmodule.cnf
-#.include ./fipsmodule.cnf
+# Need to set the absolute path.
+# https://github.com/openssl/openssl/issues/17704
+.include /home/jaruga/.local/openssl-3.0.9-fips-debug/ssl/fipsmodule.cnf
 
 [openssl_init]
 providers = provider_sect
@@ -64,8 +66,8 @@ Compile the program to test if FIPS mode is enabled or not.
 
 ```
 $ gcc \
-  -I /home/jaruga/.local/openssl-3.0.8-fips-debug-trace/include \
-  -L /home/jaruga/.local/openssl-3.0.8-fips-debug-trace/lib64 \
+  -I /home/jaruga/.local/openssl-3.0.9-fips-debug/include \
+  -L /home/jaruga/.local/openssl-3.0.9-fips-debug/lib \
   -lcrypto \
   -o fips_mode \
   fips_mode.c
@@ -74,7 +76,7 @@ $ gcc \
 Run the program. The FIPS mode is off with the command below.
 
 ```
-$ LD_LIBRARY_PATH=$HOME/.local/openssl-3.0.8-fips-debug-trace/lib64/ \
+$ LD_LIBRARY_PATH=$HOME/.local/openssl-3.0.9-fips-debug/lib/ \
   ./fips_mode
 Loaded providers:
   default
@@ -84,8 +86,8 @@ FIPS mode enabled: 0
 The FIPS mode is on with the command below.
 
 ```
-$ LD_LIBRARY_PATH=$HOME/.local/openssl-3.0.8-fips-debug-trace/lib64/ \
-  OPENSSL_CONF=/home/jaruga/.local/openssl-3.0.8-fips-debug-trace/ssl/openssl_fips.cnf \
+$ LD_LIBRARY_PATH=$HOME/.local/openssl-3.0.9-fips-debug/lib/ \
+  OPENSSL_CONF=/home/jaruga/.local/openssl-3.0.9-fips-debug/ssl/openssl_fips.cnf \
   ./fips_mode
 Loaded providers:
   fips
@@ -99,20 +101,20 @@ Compile.
 
 ```
 $ make \
-  INCFLAGS="-I /home/jaruga/.local/openssl-3.0.8-fips-debug-trace/include" \
-  LDFLAGS="-L /home/jaruga/.local/openssl-3.0.8-fips-debug-trace/lib64"
+  INCFLAGS="-I /home/jaruga/.local/openssl-3.0.9-fips-debug-/include" \
+  LDFLAGS="-L /home/jaruga/.local/openssl-3.0.9-fips-debug/lib"
 ```
 
 Run the commands.
 
 ```
-$ LD_LIBRARY_PATH=$HOME/.local/openssl-3.0.8-fips-debug-trace/lib64/ \
-  OPENSSL_CONF=/home/jaruga/.local/openssl-3.0.8-fips-debug-trace/ssl/openssl_fips.cnf \
+$ LD_LIBRARY_PATH=$HOME/.local/openssl-3.0.9-fips-debug/lib/ \
+  OPENSSL_CONF=/home/jaruga/.local/openssl-3.0.9-fips-debug/ssl/openssl_fips.cnf \
   ./fips_mode
 ...
 
-$ LD_LIBRARY_PATH=$HOME/.local/openssl-3.0.8-fips-debug-trace/lib64/ \
-  OPENSSL_CONF=/home/jaruga/.local/openssl-3.0.8-fips-debug-trace/ssl/openssl_fips.cnf \
+$ LD_LIBRARY_PATH=$HOME/.local/openssl-3.0.9-fips-debug/lib/ \
+  OPENSSL_CONF=/home/jaruga/.local/openssl-3.0.9-fips-debug/ssl/openssl_fips.cnf \
   ./fips_mode_set
 FIPS mode: 0
 FIPS mode on.
