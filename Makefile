@@ -1,6 +1,6 @@
 CC = gcc
-SRCS_GET = fips_mode.c
-SRCS_SET = fips_mode_set.c
+SRCS_GET = fips.c
+SRCS_SET = fips_set.c
 SRCS_TRACE = trace.c
 CFLAGS = $(OPTFLAGS) $(DEBUGFLAGS)
 OPTFLAGS = -O0
@@ -11,8 +11,8 @@ OBJS_GET = $(SRCS_GET:.c=.o)
 OBJS_SET = $(SRCS_SET:.c=.o)
 OBJS_TRACE = $(SRCS_TRACE:.c=.o)
 
-EXE = fips_mode
-EXE_SET = fips_mode_set
+EXE = fips
+EXE_SET = fips_set
 EXE_TRACE = trace
 EXE_ALL= $(EXE) $(EXE_SET) $(EXE_TRACE)
 LIBS = -lssl -lcrypto

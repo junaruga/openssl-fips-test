@@ -63,16 +63,16 @@ jobs:
       - if: matrix.fips-enabled
         run: cat ssl/openssl_fips.cnf
 
-      # Change the default OpenSSL config file for FIPS mode.
+      # Change the default OpenSSL config file for FIPS.
       - if: matrix.fips-enabled
         run: echo "OPENSSL_CONF=$(pwd)/ssl/openssl_fips.cnf" >> $GITHUB_ENV
 
-      - name: test FIPS mode get
+      - name: test FIPS get
         run: |
           LD_LIBRARY_PATH=$HOME/.openssl/${{ matrix.openssl }}/lib64 \
             make test
 
-      - name: test FIPS mode set
+      - name: test FIPS set
         run: |
           LD_LIBRARY_PATH=$HOME/.openssl/${{ matrix.openssl }}/lib64 \
             make test-set

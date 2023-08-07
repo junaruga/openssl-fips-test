@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/junaruga/openssl-test/actions/workflows/test.yml/badge.svg)](https://github.com/junaruga/openssl-test/actions/workflows/test.yml)
 
-This repository is to test OpenSSL API especially the FIPS mode related APIs.
+This repository is to test OpenSSL API especially the FIPS related APIs.
 
 ## How to use
 
@@ -62,37 +62,37 @@ default_properties = fips=yes
 
 ### Directly with gcc
 
-Compile the program to test if FIPS mode is enabled or not.
+Compile the program to test if FIPS is enabled or not.
 
 ```
 $ gcc \
   -I /home/jaruga/.local/openssl-3.0.9-fips-debug/include \
   -L /home/jaruga/.local/openssl-3.0.9-fips-debug/lib \
   -lcrypto \
-  -o fips_mode \
-  fips_mode.c
+  -o fips \
+  fips.c
 ```
 
-Run the program. The FIPS mode is off with the command below.
+Run the program. The FIPS is off with the command below.
 
 ```
 $ LD_LIBRARY_PATH=$HOME/.local/openssl-3.0.9-fips-debug/lib/ \
-  ./fips_mode
+  ./fips
 Loaded providers:
   default
-FIPS mode enabled: no
+FIPS enabled: no
 ```
 
-The FIPS mode is on with the command below.
+The FIPS is on with the command below.
 
 ```
 $ LD_LIBRARY_PATH=$HOME/.local/openssl-3.0.9-fips-debug/lib/ \
   OPENSSL_CONF=/home/jaruga/.local/openssl-3.0.9-fips-debug/ssl/openssl_fips.cnf \
-  ./fips_mode
+  ./fips
 Loaded providers:
   fips
   base
-FIPS mode enabled: yes
+FIPS enabled: yes
 ```
 
 ### With make
@@ -110,26 +110,26 @@ Run the commands.
 ```
 $ LD_LIBRARY_PATH=$HOME/.local/openssl-3.0.9-fips-debug/lib/ \
   OPENSSL_CONF=/home/jaruga/.local/openssl-3.0.9-fips-debug/ssl/openssl_fips.cnf \
-  ./fips_mode
+  ./fips
 ...
 
 $ LD_LIBRARY_PATH=$HOME/.local/openssl-3.0.9-fips-debug/lib/ \
   OPENSSL_CONF=/home/jaruga/.local/openssl-3.0.9-fips-debug/ssl/openssl_fips.cnf \
-  ./fips_mode_set
-FIPS mode: 0
-FIPS mode on.
-FIPS mode: 1
-FIPS mode on 2nd time.
-FIPS mode: 1
-FIPS mode off.
-FIPS mode: 0
-FIPS mode off 2nd time.
-FIPS mode: 0
+  ./fips_set
+FIPS: 0
+FIPS on.
+FIPS: 1
+FIPS on 2nd time.
+FIPS: 1
+FIPS off.
+FIPS: 0
+FIPS off 2nd time.
+FIPS: 0
 ```
 
 ## Note
 
-The `FIPS mode provider available: 1` happens when the config file `fipsmodule.cnf` has the line `activate = 1`. You can comment out this line to see the `FIPS mode provider available: 0`.
+The `FIPS provider available: 1` happens when the config file `fipsmodule.cnf` has the line `activate = 1`. You can comment out this line to see the `FIPS provider available: 0`.
 
 ```
 $ cat /path/to/fipsmodule.cnf
@@ -139,7 +139,7 @@ activate = 1
 ...
 ```
 
-The `FIPS mode enabled: yes` happens when the openssl config file `openssl.cnf` has the `default_properties = fips=yes`. You can comment out to see the `FIPS mode enabled: no`
+The `FIPS enabled: yes` happens when the openssl config file `openssl.cnf` has the `default_properties = fips=yes`. You can comment out to see the `FIPS mode enabled: no`
 
 ```
 $ cat /path/to/openssl.cnf
