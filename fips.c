@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     OSSL_PROVIDER_do_all(NULL, &print_provider, NULL);
 
     fips_enabled = EVP_default_properties_is_fips_enabled(NULL);
-    printf("FIPS mode enabled: %s\n", (fips_enabled) ? "yes" : "no");
+    printf("FIPS enabled: %s\n", (fips_enabled) ? "yes" : "no");
 
     exit(status);
 }

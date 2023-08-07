@@ -1,6 +1,6 @@
 *.o
 *.swp
 *~
-/fips_mode
-/fips_mode_set
+/fips
+/fips_set
 /trace
