@@ -80,7 +80,7 @@ $ LD_LIBRARY_PATH=$HOME/.local/openssl-3.0.9-fips-debug/lib/ \
   ./fips_mode
 Loaded providers:
   default
-FIPS mode enabled: 0
+FIPS mode enabled: no
 ```
 
 The FIPS mode is on with the command below.
@@ -92,7 +92,7 @@ $ LD_LIBRARY_PATH=$HOME/.local/openssl-3.0.9-fips-debug/lib/ \
 Loaded providers:
   fips
   base
-FIPS mode enabled: 1
+FIPS mode enabled: yes
 ```
 
 ### With make
@@ -139,7 +139,7 @@ activate = 1
 ...
 ```
 
-The `FIPS mode enabled: 1` happens when the openssl config file `openssl.cnf` has the `default_properties = fips=yes`. You can comment out to see the `FIPS mode enabled: 0`
+The `FIPS mode enabled: yes` happens when the openssl config file `openssl.cnf` has the `default_properties = fips=yes`. You can comment out to see the `FIPS mode enabled: no`
 
 ```
 $ cat /path/to/openssl.cnf
