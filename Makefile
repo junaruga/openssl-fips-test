@@ -40,6 +40,19 @@ $(EXE_TRACE) : $(OBJS_TRACE)
 clean :
 	rm -f *.o $(EXE_ALL)
 
+.PHONY: run-non-fips
+run-non-fips :
+	OPENSSL_CONF_INCLUDE=$(OPENSSL_DIR)/ssl \
+	OPENSSL_MODULES=$(OPENSSL_LIB_DIR)/ossl-modules \
+	./fips
+
+.PHONY: run-fips
+run-fips :
+	OPENSSL_CONF=$(OPENSSL_DIR)/ssl/openssl_fips.cnf \
+	OPENSSL_CONF_INCLUDE=$(OPENSSL_DIR)/ssl \
+	OPENSSL_MODULES=$(OPENSSL_LIB_DIR)/ossl-modules \
+	./fips
+
 .PHONY: test
 test :
 	@echo "Testing..."
