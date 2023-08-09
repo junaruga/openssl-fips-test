@@ -2,14 +2,18 @@ CC = gcc
 SRCS_GET = fips.c
 SRCS_SET = fips_set.c
 SRCS_TRACE = trace.c
-CFLAGS = $(OPTFLAGS) $(DEBUGFLAGS)
+OBJS_GET = $(SRCS_GET:.c=.o)
+OBJS_SET = $(SRCS_SET:.c=.o)
+OBJS_TRACE = $(SRCS_TRACE:.c=.o)
+# Customize the OpenSSL to compile with.
+OPENSSL_DIR = /home/jaruga/.local/openssl-3.2.0-dev-fips-debug-6d38ccedb2
+OPENSSL_INC_DIR = $(OPENSSL_DIR)/include
+OPENSSL_LIB_DIR = $(OPENSSL_DIR)/lib
+CFLAGS = -I $(OPENSSL_INC_DIR) -L $(OPENSSL_LIB_DIR) $(OPTFLAGS) $(DEBUGFLAGS)
 OPTFLAGS = -O0
 DEBUGFLAGS = -g3 -ggdb3 -gdwarf-5
 INCFLAGS =
 LDFLAGS =
-OBJS_GET = $(SRCS_GET:.c=.o)
-OBJS_SET = $(SRCS_SET:.c=.o)
-OBJS_TRACE = $(SRCS_TRACE:.c=.o)
 
 EXE = fips
 EXE_SET = fips_set
