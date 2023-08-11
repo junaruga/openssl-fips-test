@@ -8,28 +8,28 @@ OBJS_SET = $(SRCS_SET:.c=.o)
 OBJS_TRACE = $(SRCS_TRACE:.c=.o)
 OBJS_PRINTV = $(SRCS_PRINTV:.c=.o)
 # Customize the OpenSSL to compile with.
-OPENSSL_DIR = /home/jaruga/.local/openssl-3.2.0-dev-fips-debug-6d38ccedb2
+OPENSSL_DIR =
+# OPENSSL_DIR = /home/jaruga/.local/openssl-3.2.0-dev-fips-debug-6d38ccedb2
 # OPENSSL_DIR = /home/jaruga/.local/libressl-6650dce
 OPENSSL_INC_DIR = $(OPENSSL_DIR)/include
 OPENSSL_LIB_DIR = $(OPENSSL_DIR)/lib
 CFLAGS = -I $(OPENSSL_INC_DIR) -L $(OPENSSL_LIB_DIR) $(OPTFLAGS) $(DEBUGFLAGS)
 OPTFLAGS = -O0
 DEBUGFLAGS = -g3 -ggdb3 -gdwarf-5
-INCFLAGS =
-LDFLAGS =
+LDFLAGS = -L $(OPENSSL_LIB_DIR)
 
 EXE = fips
 EXE_SET = fips_set
 EXE_TRACE = trace
 EXE_PRINTV = printv
 # For OpenSSL
-EXE_ALL= $(EXE) $(EXE_SET) $(EXE_TRACE) $(EXE_PRINTV)
+EXE_ALL = $(EXE) $(EXE_SET) $(EXE_TRACE) $(EXE_PRINTV)
 # For LibreSSL
-# EXE_ALL= $(EXE_PRINTV)
+# EXE_ALL = $(EXE_PRINTV)
 LIBS = -lssl -lcrypto
 
 .c.o :
-	$(CC) -c $(CFLAGS) $(INCFLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $< -o $@
 
 .PHONY: all
 all : $(EXE_ALL)
