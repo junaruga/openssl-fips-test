@@ -19,5 +19,5 @@ int main(int argc, char *argv[])
     fips_enabled = EVP_default_properties_is_fips_enabled(NULL);
     printf("FIPS enabled: %s\n", (fips_enabled) ? "yes" : "no");
 
-    exit(status);
+    return status;
 }
