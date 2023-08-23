@@ -35,5 +35,5 @@ int main(int argc, char *argv[])
     printf("SSLeay_version(SSLEAY_VERSION): %s\n",
         SSLeay_version(SSLEAY_VERSION));
 #endif
-    exit(status);
+    return status;
 }

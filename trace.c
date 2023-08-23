@@ -34,5 +34,5 @@ int main(int argc, char *argv[])
     trace_decoder_enabled = OSSL_trace_enabled(OSSL_TRACE_CATEGORY_DECODER);
     printf("DECODER - Trace enabled: %d\n", (trace_decoder_enabled) ? 1 : 0);
 
-    exit(status);
+    return status;
 }
