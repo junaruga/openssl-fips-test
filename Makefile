@@ -9,7 +9,7 @@ OBJS_TRACE = $(SRCS_TRACE:.c=.o)
 OBJS_PRINTV = $(SRCS_PRINTV:.c=.o)
 # Customize the OpenSSL to compile with.
 OPENSSL_DIR =
-# OPENSSL_DIR = /home/jaruga/.local/openssl-3.2.0-dev-fips-debug-6d38ccedb2
+# OPENSSL_DIR = /home/jaruga/.local/openssl-3.2.0-dev-fips-debug-2acb0d363c
 # OPENSSL_DIR = /home/jaruga/.local/libressl-6650dce
 OPENSSL_INC_DIR = $(OPENSSL_DIR)/include
 OPENSSL_LIB_DIR = $(OPENSSL_DIR)/lib
