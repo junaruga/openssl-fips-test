@@ -1,6 +1,7 @@
 *.o
 *.swp
 *~
+/ec_builtin_curves
 /fips
 /fips_set
 /printv

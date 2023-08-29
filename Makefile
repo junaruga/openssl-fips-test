@@ -3,13 +3,16 @@ SRCS_GET = fips.c
 SRCS_SET = fips_set.c
 SRCS_TRACE = trace.c
 SRCS_PRINTV = printv.c
+SRCS_EC_BUILTIN_CURVES = ec_builtin_curves.c
 OBJS_GET = $(SRCS_GET:.c=.o)
 OBJS_SET = $(SRCS_SET:.c=.o)
 OBJS_TRACE = $(SRCS_TRACE:.c=.o)
 OBJS_PRINTV = $(SRCS_PRINTV:.c=.o)
+OBJS_EC_BUILTIN_CURVES = $(SRCS_EC_BUILTIN_CURVES:.c=.o)
 # Customize the OpenSSL to compile with.
 OPENSSL_DIR =
-# OPENSSL_DIR = /home/jaruga/.local/openssl-3.2.0-dev-fips-debug-2acb0d363c
+# Latest master branch
+# OPENSSL_DIR = /home/jaruga/.local/openssl-3.2.0-dev-fips-debug-cf712830b7
 # OPENSSL_DIR = /home/jaruga/.local/libressl-6650dce
 OPENSSL_INC_DIR = $(OPENSSL_DIR)/include
 OPENSSL_LIB_DIR = $(OPENSSL_DIR)/lib
@@ -22,8 +25,9 @@ EXE = fips
 EXE_SET = fips_set
 EXE_TRACE = trace
 EXE_PRINTV = printv
+EXE_EC_BUILTIN_CURVES = ec_builtin_curves
 # For OpenSSL
-EXE_ALL = $(EXE) $(EXE_SET) $(EXE_TRACE) $(EXE_PRINTV)
+EXE_ALL = $(EXE) $(EXE_SET) $(EXE_TRACE) $(EXE_PRINTV) $(EXE_EC_BUILTIN_CURVES)
 # For LibreSSL
 # EXE_ALL = $(EXE_PRINTV)
 LIBS = -lssl -lcrypto
@@ -44,6 +48,9 @@ $(EXE_TRACE) : $(OBJS_TRACE)
 	$(CC) $(LDFLAGS) $^ -o $@ $(LIBS)
 
 $(EXE_PRINTV) : $(OBJS_PRINTV)
+	$(CC) $(LDFLAGS) $^ -o $@ $(LIBS)
+
+$(EXE_EC_BUILTIN_CURVES) : $(OBJS_EC_BUILTIN_CURVES)
 	$(CC) $(LDFLAGS) $^ -o $@ $(LIBS)
 
 .PHONY: clean
