@@ -18,7 +18,7 @@ function print_version_str {
   if [ "${PRE_RELEASE_TAG}" = "" ]; then
     echo "${VERSION}"
   else
-    echo "${VERSION}.${PRE_RELEASE_TAG}"
+    echo "${VERSION}-${PRE_RELEASE_TAG}"
   fi
 }
 
@@ -34,11 +34,12 @@ else
 fi
 
 OPENSSL_DIR_NAME="openssl-${OPENSSL_VERSION}-fips-debug-${HEAD_COMMIT_SHORT}"
+# OPENSSL_DIR_NAME="openssl-${OPENSSL_VERSION}-fips-debug-plus-pr-21519"
 # Set the directory manually to test a pull-request.
 # OPENSSL_DIR_NAME="openssl-${OPENSSL_VERSION}-fips-debug-6bcb6d297e-plus-pr-21519"
-# OPENSSL_DIR_NAME="openssl-${OPENSSL_VERSION}-fips-debug-06a0d40322-issue-20657"
-OPENSSL_PREFIX="${HOME}/.local/${OPENSSL_DIR_NAME}"
-echo "OPENSSL_PREFIX: ${OPENSSL_PREFIX}"
+# OPENSSL_DIR_NAME="openssl-${OPENSSL_VERSION}-fips-debug-7a2bb2101b-issue-20657"
+OPENSSL_DIR="${HOME}/.local/${OPENSSL_DIR_NAME}"
+echo "OPENSSL_DIR: ${OPENSSL_DIR}"
 
 # The no-docs option is available in OpenSSL 3.2 and later versions.
 # https://github.com/openssl/openssl/pull/21240
@@ -48,21 +49,18 @@ if grep -q '"docs",' Configure; then
   configure_args_extra='no-docs'
 fi
 
-# exit
-
 ./Configure \
-  --prefix="${OPENSSL_PREFIX}" \
+  --prefix="${OPENSSL_DIR}" \
   --libdir=lib \
   shared \
   enable-fips \
   enable-trace \
+  '-Wl,-rpath,$(LIBRPATH)' \
   "${configure_args_extra}" \
   -O0 -g3 -ggdb3 -gdwarf-5
 
-# exit
-
 make -j"$(nproc)"
+
 make -j"$(nproc)" install
 
-LD_LIBRARY_PATH="${OPENSSL_PREFIX}/lib/" \
-  "${OPENSSL_PREFIX}/bin/openssl" version
+"${OPENSSL_DIR}/bin/openssl" version
