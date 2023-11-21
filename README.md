@@ -6,69 +6,26 @@ This repository is to test OpenSSL API especially the FIPS related APIs.
 
 ## How to use
 
-### Prepare OpenSSL
-
-The `enable-fips` option is to install the FIPS mododule.
+For convinience, I use the `$OPENSSL_DIR` to describe the installed OpenSSL directory in this document.
 
 ```
-$ git clone https://github.com/openssl/openssl.git
-
-$ cd openssl
-
-$ git checkout openssl-3.0.9
-
-$ ./Configure \
-  --prefix=${HOME}/.local/openssl-3.0.9-fips-debug \
-  --libdir=lib \
-  shared \
-  enable-fips \
-  enable-trace \
-  -O0 -g3 -ggdb3 -gdwarf-5
-
-$ make -j$(nproc)
-
-$ make install
-
-$ LD_LIBRARY_PATH="${HOME}/.local/openssl-3.0.9-fips-debug/lib/" \
-  "${HOME}/.local/openssl-3.0.9-fips-debug/bin/openssl" version
-OpenSSL 3.0.9 30 May 2023 (Library: OpenSSL 3.0.9 30 May 2023)
+$ OPENSSL_DIR="$HOME/.local/openssl-3.3.0-dev-fips-debug-1aa08644ec"
 ```
 
-Set the following file.
+### Install OpenSSL
 
-```
-$ cat ~/.local/openssl-3.0.9-fips-debug/ssl/openssl_fips.cnf
-config_diagnostics = 1
-openssl_conf = openssl_init
+See [this document](https://github.com/ruby/openssl/blob/master/CONTRIBUTING.md#with-different-versions-of-openssl) to install OpenSSL with FIPS option.
 
-# Need to set the absolute path.
-# https://github.com/openssl/openssl/issues/17704
-.include /home/jaruga/.local/openssl-3.0.9-fips-debug/ssl/fipsmodule.cnf
-
-[openssl_init]
-providers = provider_sect
-alg_section = algorithm_sect
-
-[provider_sect]
-fips = fips_sect
-base = base_sect
-
-[base_sect]
-activate = 1
-
-[algorithm_sect]
-default_properties = fips=yes
-```
-
-### Directly with gcc
+### Compile the program "fips.c" to check the FIPS status
 
 Compile the program to test if FIPS is enabled or not.
 
 ```
 $ gcc \
-  -I /home/jaruga/.local/openssl-3.0.9-fips-debug/include \
-  -L /home/jaruga/.local/openssl-3.0.9-fips-debug/lib \
+  -I $OPENSSL_DIR/include \
+  -L $OPENSSL_DIR/lib \
   -lcrypto \
+  "-Wl,-rpath,$OPENSSL_DIR/lib" \
   -o fips \
   fips.c
 ```
@@ -76,47 +33,49 @@ $ gcc \
 Run the program. The FIPS is off with the command below.
 
 ```
-$ LD_LIBRARY_PATH=$HOME/.local/openssl-3.0.9-fips-debug/lib/ \
-  ./fips
+$ ./fips
 Loaded providers:
   default
+Loaded provider number: 1
 FIPS enabled: no
 ```
 
 The FIPS is on with the command below.
 
 ```
-$ LD_LIBRARY_PATH=$HOME/.local/openssl-3.0.9-fips-debug/lib/ \
-  OPENSSL_CONF=/home/jaruga/.local/openssl-3.0.9-fips-debug/ssl/openssl_fips.cnf \
+$ OPENSSL_CONF=$OPENSSL_DIR/ssl/openssl_fips.cnf \
   ./fips
 Loaded providers:
   fips
   base
+Loaded provider number: 2
 FIPS enabled: yes
 ```
 
-### With make
+### Compile with make
 
 Compile.
 
 ```
 $ make \
-  INCFLAGS="-I /home/jaruga/.local/openssl-3.0.9-fips-debug-/include" \
-  LDFLAGS="-L /home/jaruga/.local/openssl-3.0.9-fips-debug/lib"
+  INCFLAGS="-I $OPENSSL_DIR/include" \
+  LDFLAGS="-L $OPENSSL_DIR/lib"
 ```
 
 Run the commands.
 
 ```
-$ LD_LIBRARY_PATH=$HOME/.local/openssl-3.0.9-fips-debug/lib/ \
-  OPENSSL_CONF=/home/jaruga/.local/openssl-3.0.9-fips-debug/ssl/openssl_fips.cnf \
+$ OPENSSL_CONF=$OPENSSL_DIR/ssl/openssl_fips.cnf \
   ./fips
-...
+Loaded providers:
+  fips
+  base
+Loaded provider number: 2
+FIPS enabled: yes
 
-$ LD_LIBRARY_PATH=$HOME/.local/openssl-3.0.9-fips-debug/lib/ \
-  OPENSSL_CONF=/home/jaruga/.local/openssl-3.0.9-fips-debug/ssl/openssl_fips.cnf \
+$ OPENSSL_CONF=$OPENSSL_DIR/ssl/openssl_fips.cnf \
   ./fips_set
-FIPS: 0
+FIPS: 1
 FIPS on.
 FIPS: 1
 FIPS on 2nd time.
@@ -125,25 +84,4 @@ FIPS off.
 FIPS: 0
 FIPS off 2nd time.
 FIPS: 0
-```
-
-## Note
-
-The `FIPS provider available: 1` happens when the config file `fipsmodule.cnf` has the line `activate = 1`. You can comment out this line to see the `FIPS provider available: 0`.
-
-```
-$ cat /path/to/fipsmodule.cnf
-...
-[fips_sect]
-activate = 1
-...
-```
-
-The `FIPS enabled: yes` happens when the openssl config file `openssl.cnf` has the `default_properties = fips=yes`. You can comment out to see the `FIPS mode enabled: no`
-
-```
-$ cat /path/to/openssl.cnf
-...
-[algorithm_sect]
-default_properties = fips=yes
 ```
